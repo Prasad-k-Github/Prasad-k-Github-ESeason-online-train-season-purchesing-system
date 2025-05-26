@@ -106,8 +106,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         children: [
                           _buildCategoryCard('Apply Season', Icons.card_membership, const Color(0xFFFF5E0E)),
                           _buildCategoryCard('Train Timetables', Icons.schedule, const Color(0xFF4CAF50)),
-                          _buildCategoryCard('Book Ticket', Icons.confirmation_number, const Color(0xFF2196F3)),
-                          _buildCategoryCard('Lost & Found', Icons.search, const Color(0xFFFF9800)),
+                          _buildCategoryCard('Lost & Found', Icons.search, const Color(0xFF2196F3)),
                         ],
                       ),
                     ),
@@ -136,8 +135,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const SizedBox(height: 16),
                       Expanded(
                         child: GridView.count(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
+                          crossAxisCount: 1,
                           mainAxisSpacing: 16,
                           children: [
                             _buildNewsCard('New Express Train', 'Delhi to Mumbai', 'assets/images/download3.png'),
@@ -189,33 +187,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
   
   Widget _buildCategoryCard(String title, IconData icon, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(right: 16),
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: color,
-            size: 32,
+    return InkWell(
+      onTap: () {
+        // Handle the tap event
+        print('$title category tapped');
+        // You can add navigation or other actions here
+        // For example: Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(title: title)));
+      },
+      splashColor: color.withOpacity(0.3),
+      highlightColor: color.withOpacity(0.1),
+      borderRadius: BorderRadius.circular(15), // Match the container's border radius
+      child: TweenAnimationBuilder(
+        duration: const Duration(milliseconds: 200),
+        tween: Tween<double>(begin: 1, end: 1),
+        builder: (context, double scale, child) {
+          return Transform.scale(
+            scale: scale,
+            child: child,
+          );
+        },
+        child: Container(
+          margin: const EdgeInsets.only(right: 16),
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(15),
           ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: TextStyle(
-              fontFamily: 'Railway',
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: color,
+                size: 32,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontFamily: 'Railway',
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

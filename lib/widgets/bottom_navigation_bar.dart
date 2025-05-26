@@ -1,4 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:e_season/dashboard_screen.dart';
+import 'package:e_season/season_screen.dart';
+import 'package:e_season/timetable_screen.dart';
+import 'package:e_season/profile_screen.dart';
+import 'package:e_season/chatbot_screen.dart';
+
+class RootScreen extends StatefulWidget {
+  const RootScreen({super.key});
+
+  @override
+  State<RootScreen> createState() => _RootScreenState();
+}
+
+class _RootScreenState extends State<RootScreen> {
+  int _selectedIndex = 0;
+  
+  final List<Widget> _screens = [
+    const DashboardScreen(),
+    const SeasonScreen(),
+    const SizedBox(), // Empty widget for center button
+    const TimetableScreen(),
+    const ProfileScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    if (index == 2) { // Center button (Chatbot)
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ChatbotScreen()),
+      );
+      return;
+    }
+    
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: CustomBottomNavigationBar(
+        selectedIndex: _selectedIndex,
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int selectedIndex;
@@ -18,22 +67,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 15,
-                spreadRadius: 1,
-                offset: const Offset(0, -3),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 15, spreadRadius: 1, offset: const Offset(0, -3))],
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFFFF8E1),  // Light cream
-                Colors.white,
-                Color(0xFFFFF8E1),  // Light cream
-              ],
+              colors: [Color(0xFFFFF8E1), Colors.white, Color(0xFFFFF8E1)],
               stops: [0.0, 0.5, 1.0],
             ),
           ),
@@ -54,10 +92,6 @@ class CustomBottomNavigationBar extends StatelessWidget {
               fontFamily: 'Railway',
               fontSize: 10,
             ),
-            iconSize: 24,
-            selectedIconTheme: const IconThemeData(
-              size: 28,
-            ),
             items: [
               _buildNavItem(Icons.home_outlined, 'Home', 0),
               _buildNavItem(Icons.calendar_today_outlined, 'Seasons', 1),
@@ -67,7 +101,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
             ],
           ),
         ),
-        // Floating chatbot button
+        // Chatbot button
         GestureDetector(
           onTap: () {
             // Handle chatbot tap
@@ -78,26 +112,15 @@ class CustomBottomNavigationBar extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFFFF5E0E),
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFFF5E0E).withOpacity(0.3),
-                  spreadRadius: 2,
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: const Color(0xFFFF5E0E).withOpacity(0.3), spreadRadius: 2, blurRadius: 8, offset: const Offset(0, 3))],
             ),
-            child: const Icon(
-              Icons.smart_toy_outlined,  // Changed from chat_bubble_rounded to smart_toy_outlined
-              color: Colors.white,
-              size: 28,
-            ),
+            child: const Icon(Icons.smart_toy_outlined, color: Colors.white, size: 28),
           ),
         ),
       ],
     );
   }
-  
+
   BottomNavigationBarItem _buildNavItem(IconData icon, String label, int index) {
     final bool isSelected = selectedIndex == index;
     
@@ -120,28 +143,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
           color: isSelected ? const Color(0xFFFF5E0E) : const Color(0xFF4D4238).withOpacity(0.5),
         ),
       ),
-      activeIcon: Container(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFF5E0E).withOpacity(0.1),
-          borderRadius: BorderRadius.circular(15),
-          border: const Border(
-            top: BorderSide(
-              color: Color(0xFFFF5E0E),
-              width: 3,
-            ),
-          ),
-        ),
-        child: Icon(
-          icon,
-          color: const Color(0xFFFF5E0E),
-        ),
-      ),
       label: label,
     );
   }
-  
-  // Empty navigation item to create space for the center button
+
   BottomNavigationBarItem _buildEmptyNavItem(int i) {
     return const BottomNavigationBarItem(
       icon: SizedBox(height: 24),

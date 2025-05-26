@@ -1,5 +1,6 @@
+import 'package:e_season/season_screen.dart';
+import 'package:e_season/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'widgets/bottom_navigation_bar.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -10,6 +11,19 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    
+    if (index == 1) { // Seasons tab
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SeasonScreen()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,11 +169,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
         selectedIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+        onTap: _onItemTapped,
       ),
     );
   }
@@ -191,8 +201,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       onTap: () {
         // Handle the tap event
         print('$title category tapped');
-        // You can add navigation or other actions here
-        // For example: Navigator.push(context, MaterialPageRoute(builder: (context) => DetailScreen(title: title)));
+        // Navigate to the appropriate screen based on the category
+        if (title == 'Apply Season') {
+          Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => const SeasonScreen()),
+          );
+        }
+        // You can add navigation for other categories here
       },
       splashColor: color.withOpacity(0.3),
       highlightColor: color.withOpacity(0.1),

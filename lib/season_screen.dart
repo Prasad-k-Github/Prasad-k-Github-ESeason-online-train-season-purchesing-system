@@ -1,5 +1,4 @@
 import 'package:e_season/dashboard_screen.dart';
-import 'package:e_season/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
 class SeasonScreen extends StatefulWidget {
@@ -16,8 +15,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    
-    if (index == 0) { // Home tab
+
+    if (index == 0) {
+      // Home tab
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const DashboardScreen()),
@@ -73,15 +73,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   ],
                 ),
               ),
-              
+
               // Apply Season Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: _buildApplySeasonButton(),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Previous Seasons
               Expanded(
                 child: Padding(
@@ -102,10 +102,26 @@ class _SeasonScreenState extends State<SeasonScreen> {
                       Expanded(
                         child: ListView(
                           children: [
-                            _buildPreviousSeasonCard('Summer Season 2023', 'Valid: May - Aug 2023', 'Expired'),
-                            _buildPreviousSeasonCard('Winter Season 2022', 'Valid: Nov - Feb 2022', 'Expired'),
-                            _buildPreviousSeasonCard('Monsoon Season 2022', 'Valid: Jun - Sep 2022', 'Expired'),
-                            _buildPreviousSeasonCard('Spring Season 2022', 'Valid: Mar - May 2022', 'Expired'),
+                            _buildPreviousSeasonCard(
+                              'Summer Season 2023',
+                              'Valid: May - Aug 2023',
+                              'Expired',
+                            ),
+                            _buildPreviousSeasonCard(
+                              'Winter Season 2022',
+                              'Valid: Nov - Feb 2022',
+                              'Expired',
+                            ),
+                            _buildPreviousSeasonCard(
+                              'Monsoon Season 2022',
+                              'Valid: Jun - Sep 2022',
+                              'Expired',
+                            ),
+                            _buildPreviousSeasonCard(
+                              'Spring Season 2022',
+                              'Valid: Mar - May 2022',
+                              'Expired',
+                            ),
                           ],
                         ),
                       ),
@@ -117,13 +133,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
     );
   }
-  
+
   Widget _buildApplySeasonButton() {
     return GestureDetector(
       onTap: () {
@@ -149,11 +161,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.add_circle_outline,
-              color: Colors.white,
-              size: 24,
-            ),
+            Icon(Icons.add_circle_outline, color: Colors.white, size: 24),
             SizedBox(width: 12),
             Text(
               'Apply for New Season',
@@ -169,8 +177,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
       ),
     );
   }
-  
-  Widget _buildPreviousSeasonCard(String title, String validity, String status) {
+
+  Widget _buildPreviousSeasonCard(
+    String title,
+    String validity,
+    String status,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -197,10 +209,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Center(
-                child: Icon(
-                  Icons.calendar_today,
-                  color: Color(0xFFFF5E0E),
-                ),
+                child: Icon(Icons.calendar_today, color: Color(0xFFFF5E0E)),
               ),
             ),
             const SizedBox(width: 16),

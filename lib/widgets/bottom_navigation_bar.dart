@@ -103,9 +103,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         ),
         // Chatbot button
         GestureDetector(
-          onTap: () {
-            // Handle chatbot tap
-          },
+          onTap: () => onTap(2),
           child: Container(
             height: 60,
             width: 60,

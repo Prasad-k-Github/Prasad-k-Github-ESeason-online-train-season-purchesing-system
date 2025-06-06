@@ -1,4 +1,5 @@
 import 'package:e_season/dashboard_screen.dart';
+import 'package:e_season/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -226,11 +227,11 @@ class _LoginScreenState extends State<LoginScreen>
                                 setState(() {
                                   _isLoginButtonPressed = false;
                                 });
-                                // Navigate to Dashboard
-                                Navigator.push(
+                                // Navigate to RootScreen instead of DashboardScreen
+                                Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const DashboardScreen(),
+                                    builder: (context) => const RootScreen(),
                                   ),
                                 );
                               },

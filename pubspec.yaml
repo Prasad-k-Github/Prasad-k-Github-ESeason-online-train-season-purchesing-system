@@ -13,6 +13,8 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+  http: ^1.1.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
@@ -22,15 +24,15 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  
+
   assets:
-    - assets/images/download3.png
-    - assets/images/google_logo.png
-    
+  - assets/images/download3.png
+  - assets/images/google_logo.png
+
   fonts:
-    - family: Railway
-      fonts:
-        - asset: assets/fonts/Railway.otf
-    - family: RailwayAlternate
-      fonts:
-        - asset: assets/fonts/RailwayAlternate.otf
+  - family: Railway
+    fonts:
+    - asset: assets/fonts/Railway.otf
+  - family: RailwayAlternate
+    fonts:
+    - asset: assets/fonts/RailwayAlternate.otf

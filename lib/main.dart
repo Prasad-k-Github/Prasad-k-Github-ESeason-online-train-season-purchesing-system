@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'welcome_screen.dart';
 import 'widgets/bottom_navigation_bar.dart';
+import 'services/auth_service.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  // Ensure Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Check if user is logged in
+  final bool isLoggedIn = await AuthService.isLoggedIn();
+
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +29,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4A90E2)),
         useMaterial3: true,
       ),
-      home: const WelcomeScreen(), // Keep this for now as entry point
+      // Use RootScreen as home if logged in, otherwise use WelcomeScreen
+      home: isLoggedIn ? const RootScreen() : const WelcomeScreen(),
     );
   }
 }

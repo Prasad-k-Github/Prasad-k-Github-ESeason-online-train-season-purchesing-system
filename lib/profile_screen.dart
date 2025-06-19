@@ -1,7 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:e_season/services/auth_service.dart';
+import 'package:e_season/models/auth_models.dart';
+import 'package:e_season/welcome_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  UserData? _userData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final userData = await AuthService.getUserData();
+      setState(() {
+        _userData = userData;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading profile: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    try {
+      await AuthService.logout();
+      if (!mounted) return;
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+        (route) => false,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error logging out: ${e.toString()}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,46 +75,91 @@ class ProfileScreen extends StatelessWidget {
                 const CircleAvatar(
                   radius: 50,
                   backgroundColor: Color(0xFFFF5E0E),
-                  child: Icon(
-                    Icons.person,
-                    size: 50,
-                    color: Colors.white,
-                  ),
+                  child: Icon(Icons.person, size: 50, color: Colors.white),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'John Doe',
-                  style: TextStyle(
-                    fontFamily: 'Railway',
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF4D4238),
-                  ),
-                ),
-                Text(
-                  'john.doe@example.com',
-                  style: TextStyle(
-                    fontFamily: 'Railway',
-                    fontSize: 16,
-                    color: const Color(0xFF4D4238).withOpacity(0.7),
-                  ),
-                ),
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : Column(
+                      children: [
+                        Text(
+                          _userData?.fullName ?? 'User',
+                          style: const TextStyle(
+                            fontFamily: 'Railway',
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF4D4238),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _userData?.email ?? 'No email available',
+                          style: TextStyle(
+                            fontFamily: 'Railway',
+                            fontSize: 16,
+                            color: const Color(0xFF4D4238).withOpacity(0.7),
+                          ),
+                        ),
+                      ],
+                    ),
                 const SizedBox(height: 32),
-                _buildProfileSection(
-                  'Personal Information',
-                  [
-                    _buildProfileItem(Icons.phone, 'Phone', '+1 234 567 890'),
-                    _buildProfileItem(Icons.location_on, 'Address', '123 Railway Street, City'),
-                    _buildProfileItem(Icons.calendar_today, 'Date of Birth', '01/01/1990'),
-                  ],
-                ),
-                _buildProfileSection(
-                  'Travel History',
-                  [
-                    _buildProfileItem(Icons.train, 'Recent Trips', '15 trips this year'),
-                    _buildProfileItem(Icons.card_membership, 'Season Pass', 'Valid until Dec 2023'),
-                    _buildProfileItem(Icons.star, 'Loyalty Points', '2500 points'),
-                  ],
+                _buildProfileSection('Personal Information', [
+                  _buildProfileItem(
+                    Icons.person,
+                    'Name with Initials',
+                    _userData?.nameWithInitials ?? 'Not provided',
+                  ),
+                  _buildProfileItem(
+                    Icons.phone,
+                    'Phone',
+                    _userData?.phone ?? 'Not provided',
+                  ),
+                  _buildProfileItem(
+                    Icons.location_on,
+                    'Address',
+                    _userData?.address ?? 'Not provided',
+                  ),
+                ]),
+                _buildProfileSection('Travel Information', [
+                  _buildProfileItem(
+                    Icons.train,
+                    'From Station',
+                    _userData?.fromStation ?? 'Not provided',
+                  ),
+                  _buildProfileItem(
+                    Icons.train,
+                    'To Station',
+                    _userData?.toStation ?? 'Not provided',
+                  ),
+                  _buildProfileItem(
+                    Icons.calendar_today,
+                    'Travel Date',
+                    _userData?.travelDate ?? 'Not provided',
+                  ),
+                ]),
+
+                // Logout button
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton(
+                    onPressed: _handleLogout,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF5E0E),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                    child: const Text(
+                      'Logout',
+                      style: TextStyle(
+                        fontFamily: 'Railway',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -121,11 +216,7 @@ class ProfileScreen extends StatelessWidget {
               color: const Color(0xFFFF5E0E).withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
-              icon,
-              color: const Color(0xFFFF5E0E),
-              size: 24,
-            ),
+            child: Icon(icon, color: const Color(0xFFFF5E0E), size: 24),
           ),
           const SizedBox(width: 16),
           Column(

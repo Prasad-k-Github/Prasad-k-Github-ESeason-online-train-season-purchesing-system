@@ -1,7 +1,8 @@
-import 'package:e_season/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:e_season/services/auth_service.dart';
+import 'package:e_season/services/api_service.dart';
 import 'package:e_season/models/auth_models.dart';
+import 'package:e_season/widgets/bottom_navigation_bar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -87,11 +88,11 @@ class _LoginScreenState extends State<LoginScreen>
     });
 
     try {
-      // In a real app, you would make an API call here
-      // For now, we'll simulate a successful login
+      // Get user input
       final String email = _loginEmailController.text.trim();
       final String password = _loginPasswordController.text;
 
+      // Validate input
       if (email.isEmpty || password.isEmpty) {
         setState(() {
           _errorMessage = 'Please fill in all fields';
@@ -100,24 +101,25 @@ class _LoginScreenState extends State<LoginScreen>
         return;
       }
 
-      // Simulate token from API
-      const String mockToken = 'mock_auth_token';
-      // Create user data
-      final userData = UserData(
-        id: 'user_${DateTime.now().millisecondsSinceEpoch}',
-        email: email,
-        fullName: 'Default User', // Update with actual name when available
-      );
+      // Call API service for login
+      final LoginResponse response = await ApiService.login(email, password);
 
-      // Save auth data to local storage
-      await AuthService.saveAuthData(mockToken, userData);
+      if (response.success && response.token != null && response.user != null) {
+        // Save auth data to local storage
+        await AuthService.saveAuthData(response.token!, response.user!);
 
-      // Navigate to home screen
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const RootScreen()),
-        );
+        // Navigate to home screen
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const RootScreen()),
+          );
+        }
+      } else {
+        // Show error message from API
+        setState(() {
+          _errorMessage = response.message;
+        });
       }
     } catch (e) {
       setState(() {
@@ -148,14 +150,17 @@ class _LoginScreenState extends State<LoginScreen>
       final String email = _signupEmailController.text.trim();
       final String fromStation = _fromStationController.text.trim();
       final String toStation = _toStationController.text.trim();
-      final String date = _dateController.text.trim();
+      final String travelDate = _dateController.text.trim();
       final String password = _signupPasswordController.text;
       final String confirmPassword = _confirmPasswordController.text;
 
       // Validation
-      if (email.isEmpty || password.isEmpty) {
+      if (nameWithInitials.isEmpty ||
+          fullName.isEmpty ||
+          email.isEmpty ||
+          password.isEmpty) {
         setState(() {
-          _errorMessage = 'Email and password are required';
+          _errorMessage = 'Please fill in all required fields';
           _isLoading = false;
         });
         return;
@@ -177,24 +182,36 @@ class _LoginScreenState extends State<LoginScreen>
         return;
       }
 
-      // Simulate token from API
-      const String mockToken = 'mock_auth_token';
-      // Create user data
-      final userData = UserData(
-        id: 'user_${DateTime.now().millisecondsSinceEpoch}',
+      // Call API service for registration
+      final LoginResponse response = await ApiService.register(
+        nameWithInitials: nameWithInitials,
+        fullName: fullName,
+        address: address,
+        phoneNumber: phoneNumber,
         email: email,
-        fullName: fullName.isNotEmpty ? fullName : nameWithInitials,
+        fromStation: fromStation,
+        toStation: toStation,
+        travelDate: travelDate,
+        password: password,
+        confirmPassword: confirmPassword,
       );
 
-      // Save auth data to local storage
-      await AuthService.saveAuthData(mockToken, userData);
+      if (response.success && response.token != null && response.user != null) {
+        // Save auth data to local storage
+        await AuthService.saveAuthData(response.token!, response.user!);
 
-      // Navigate to home screen
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const RootScreen()),
-        );
+        // Navigate to home screen
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const RootScreen()),
+          );
+        }
+      } else {
+        // Show error message from API
+        setState(() {
+          _errorMessage = response.message;
+        });
       }
     } catch (e) {
       setState(() {

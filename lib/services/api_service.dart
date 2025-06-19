@@ -3,7 +3,9 @@ import 'package:http/http.dart' as http;
 import 'package:e_season/models/auth_models.dart';
 
 class ApiService {
-  static const String _baseUrl = 'http://localhost:8080/api/v1';
+  // Update this base URL when deploying to production
+  static const String _baseUrl =
+      'https://9bed-2407-c00-5003-cd84-48f2-ed2a-3894-cb30.ngrok-free.app/api/v1';
 
   // Login function
   static Future<LoginResponse> login(String email, String password) async {
@@ -12,12 +14,16 @@ class ApiService {
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true', // For ngrok
+        },
         body: jsonEncode({'email': email, 'password': password}),
       );
 
       if (response.statusCode == 200) {
-        return LoginResponse.fromJson(jsonDecode(response.body));
+        final responseData = jsonDecode(response.body);
+        return LoginResponse.fromJson(responseData);
       } else {
         // Handle error responses
         final errorData = jsonDecode(response.body);
@@ -69,12 +75,16 @@ class ApiService {
 
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true', // For ngrok
+        },
         body: jsonEncode(requestBody),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return LoginResponse.fromJson(jsonDecode(response.body));
+        final responseData = jsonDecode(response.body);
+        return LoginResponse.fromJson(responseData);
       } else {
         // Handle error responses
         final errorData = jsonDecode(response.body);

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:e_season/services/auth_service.dart';
+import 'package:e_season/models/auth_models.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -8,6 +10,23 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  UserData? _userData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final userData = await AuthService.getUserData();
+    setState(() {
+      _userData = userData;
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -46,15 +65,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ],
               ),
-            ),
-
-            // Welcome message
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.0),
+            ), // Welcome message
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Welcome back,',
                     style: TextStyle(
                       fontFamily: 'Railway',
@@ -62,20 +79,106 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       color: Color(0xFF4D4238),
                     ),
                   ),
-                  Text(
-                    'User!',
-                    style: TextStyle(
-                      fontFamily: 'Railway',
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF4D4238),
-                    ),
-                  ),
+                  _isLoading
+                      ? const CircularProgressIndicator(
+                        color: Color(0xFFFF5E0E),
+                      )
+                      : Text(
+                        _userData?.fullName ?? 'User!',
+                        style: const TextStyle(
+                          fontFamily: 'Railway',
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF4D4238),
+                        ),
+                      ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 48),
+            const SizedBox(height: 24),
+
+            // Season Status Card
+            if (_userData != null && !_isLoading)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF5E0E).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.train,
+                              color: Color(0xFFFF5E0E),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              'Your Season Pass',
+                              style: TextStyle(
+                                fontFamily: 'Railway',
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4D4238),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF4CAF50).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text(
+                              'Active',
+                              style: TextStyle(
+                                color: Color(0xFF4CAF50),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildSeasonInfoRow(
+                        'Route',
+                        '${_userData?.fromStation ?? 'N/A'} to ${_userData?.toStation ?? 'N/A'}',
+                      ),
+                      _buildSeasonInfoRow(
+                        'Travel Date',
+                        _userData?.travelDate ?? 'Not specified',
+                      ),
+                      _buildSeasonInfoRow('Expires', '30 days from purchase'),
+                    ],
+                  ),
+                ),
+              ),
+
+            const SizedBox(height: 24),
 
             // Our Services Categories
             Padding(
@@ -179,9 +282,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildCategoryCard(String title, IconData icon, Color color) {
     return InkWell(
       onTap: () {
-        // Handle the tap event
-        print('$title category tapped');
-        // Categories will be handled by the single navigation bar
+        // Handle navigation based on title
+        switch (title) {
+          case 'Apply Season':
+            Navigator.pushNamed(context, '/season');
+            break;
+          case 'Train Timetables':
+            Navigator.pushNamed(context, '/timetable');
+            break;
+          case 'Lost & Found':
+            Navigator.pushNamed(context, '/chatbot');
+            break;
+        }
       },
       splashColor: color.withOpacity(0.3),
       highlightColor: color.withOpacity(0.1),
@@ -193,6 +305,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         decoration: BoxDecoration(
           color: color.withOpacity(0.2),
           borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.1),
+              blurRadius: 5,
+              spreadRadius: 1,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -265,6 +385,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSeasonInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Railway',
+              color: const Color(0xFF4D4238).withOpacity(0.6),
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontFamily: 'Railway',
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF4D4238),
             ),
           ),
         ],
